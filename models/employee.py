@@ -2,6 +2,7 @@
 import base64
 import hashlib
 import functools
+import re
 
 from google.appengine.ext import ndb
 from google.appengine.api import users
@@ -46,6 +47,10 @@ class Employee(ndb.Model, Pagination):
         user_email = user.email()
         employee = cls.query(cls.user == user, cls.terminated == False).get()  # noqa
         if employee is None:
+            # if you change the GAE domain settings, the user objects change
+            # and the above query fails. this query will work for that
+            employee = cls.get_employee_by_email(user_email)
+        if employee is None:
             raise NoSuchEmployee('Couldn\'t find a Google Apps user with email {}'.format(user_email))
         return employee
 
@@ -60,6 +65,15 @@ class Employee(ndb.Model, Pagination):
             new_employee.put()
 
         return new_employee
+
+    @classmethod
+    def get_employee_by_email(cls, email):
+        regex = '(.*)@{}'.format(config.DOMAIN)
+        match = re.match(regex, email)
+        if not match:
+            return None
+        username = match.group(1)
+        return cls.query(cls.username == username, cls.terminated == False).get()  # noqa
 
     @classmethod
     def key_to_username(cls, key):
