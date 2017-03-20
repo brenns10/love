@@ -6,9 +6,9 @@ Flask-Themes2==0.1.4
 itsdangerous==0.24
 Jinja2==2.9.5
 MarkupSafe==1.0
+python_http_client==2.2.1
 pytz==2016.10
+sendgrid==3.6.3
 urllib3==1.20
 Werkzeug==0.12
 wheel==0.29.0
-sendgrid==3.6.3
-python_http_client==2.2.1
